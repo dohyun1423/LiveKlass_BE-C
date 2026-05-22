@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Notification Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1100px;
+            margin: 32px auto;
+            line-height: 1.5;
+            color: #222;
+        }
+
+        h1 {
+            margin-bottom: 24px;
+        }
+
+        section {
+            border: 1px solid #ddd;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-top: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            cursor: pointer;
+            border: 1px solid #bbb;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+
+        button:hover {
+            background: #f0f0f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        tr {
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background: #f7f7f7;
+        }
+
+        tr.selected {
+            background: #e9f2ff;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            min-height: 80px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .muted {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #eee;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<h1>Notification Test</h1>
+
+<div class="grid">
+    <section>
+        <h2>알림 등록</h2>
+
+        <div class="row">
+            <div>
+                <label>수신자 ID</label>
+                <input id="recipientId" type="number" value="1" />
+            </div>
+
+            <div>
+                <label>강의 ID</label>
+                <input id="lectureId" type="number" value="10" />
+            </div>
+        </div>
+
+        <label>알림 타입</label>
+        <select id="notificationType">
+            <option value="COURSE_ENROLLMENT_COMPLETED">COURSE_ENROLLMENT_COMPLETED</option>
+            <option value="PAYMENT_CONFIRMED">PAYMENT_CONFIRMED</option>
+            <option value="COURSE_START_D_MINUS_1">COURSE_START_D_MINUS_1</option>
+            <option value="ENROLLMENT_CANCELED">ENROLLMENT_CANCELED</option>
+        </select>
+
+        <label>채널</label>
+        <select id="channel">
+            <option value="IN_APP">IN_APP</option>
+            <option value="EMAIL">EMAIL</option>
+        </select>
+
+        <label>이벤트 ID</label>
+        <input id="eventId" value="enrollment-1001" />
+
+        <label>제목</label>
+        <input id="title" value="수강 신청 완료" />
+
+        <label>내용</label>
+        <textarea id="message" rows="3">수강 신청이 완료되었습니다.</textarea>
+
+        <label>참조 데이터</label>
+        <textarea id="referenceData" rows="3">{"enrollmentId":1001}</textarea>
+
+        <button onclick="createNotification()">알림 등록</button>
+
+        <p class="muted">
+            등록 후 상태는 PENDING이고, Worker 처리 후 SENT로 바뀝니다.
+        </p>
+    </section>
+
+    <section>
+        <h2>사용자 알림 조회</h2>
+
+        <label>X-USER-ID</label>
+        <input id="userId" type="number" value="1" />
+
+        <label>읽음 필터</label>
+        <select id="unreadOnly">
+            <option value="">전체</option>
+            <option value="true">안 읽음</option>
+            <option value="false">읽음</option>
+        </select>
+
+        <div class="actions">
+            <button onclick="getMine()">목록 조회</button>
+            <button onclick="getSelected()">선택 조회</button>
+            <button onclick="markSelectedRead()">읽음 처리</button>
+            <button onclick="clearSelection()">선택 해제</button>
+        </div>
+
+        <p class="muted">
+            목록에서 알림을 클릭하면 선택됩니다. 읽음 처리는 선택된 알림에 대해 실행됩니다.
+        </p>
+
+        <div>
+            선택된 알림:
+            <span id="selectedLabel" class="pill">없음</span>
+        </div>
+    </section>
+</div>
+
+<section>
+    <h2>알림 목록</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>수신자</th>
+            <th>타입</th>
+            <th>채널</th>
+            <th>상태</th>
+            <th>제목</th>
+            <th>읽음</th>
+            <th>생성일</th>
+        </tr>
+        </thead>
+        <tbody id="listBody">
+        <tr>
+            <td colspan="8" class="muted">목록 조회 전입니다.</td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>응답</h2>
+    <pre id="result">아직 요청 없음</pre>
+</section>
+
+<script>
+    let selectedId = null;
+    let lastList = [];
+
+    const result = document.getElementById("result");
+    const listBody = document.getElementById("listBody");
+    const selectedLabel = document.getElementById("selectedLabel");
+
+    function print(data) {
+        result.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function printError(error) {
+        result.textContent = error.message;
+    }
+
+    function updateSelectedLabel() {
+        selectedLabel.textContent = selectedId ? `ID ${selectedId}` : "없음";
+    }
+
+    function clearSelection() {
+        selectedId = null;
+        updateSelectedLabel();
+        renderList(lastList);
+    }
+
+    function selectNotification(id) {
+        selectedId = id;
+        updateSelectedLabel();
+        renderList(lastList);
+    }
+
+    function renderList(list) {
+        lastList = list;
+
+        if (!list.length) {
+            listBody.innerHTML = '<tr><td colspan="8" class="muted">조회된 알림이 없습니다.</td></tr>';
+            return;
+        }
+
+        listBody.innerHTML = list.map(item => {
+            const selectedClass = item.id === selectedId ? "selected" : "";
+            const readText = item.readAt ? "읽음" : "안읽음";
+
+            return `
+          <tr class="${selectedClass}" onclick="selectNotification(${item.id})">
+            <td>${item.id}</td>
+            <td>${item.recipientId}</td>
+            <td>${item.notificationType}</td>
+            <td>${item.channel}</td>
+            <td>${item.status}</td>
+            <td>${escapeHtml(item.title ?? "")}</td>
+            <td>${readText}</td>
+            <td>${item.createdAt ?? ""}</td>
+          </tr>
+        `;
+        }).join("");
+    }
+
+    function escapeHtml(value) {
+        return value
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    async function createNotification() {
+        const body = {
+            recipientId: Number(document.getElementById("recipientId").value),
+            notificationType: document.getElementById("notificationType").value,
+            eventId: document.getElementById("eventId").value,
+            lectureId: Number(document.getElementById("lectureId").value),
+            channel: document.getElementById("channel").value,
+            title: document.getElementById("title").value,
+            message: document.getElementById("message").value,
+            referenceData: document.getElementById("referenceData").value
+        };
+
+        try {
+            const res = await fetch("/api/notifications", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+            selectedId = data.id;
+            updateSelectedLabel();
+            print(data);
+        } catch (error) {
+            printError(error);
+        }
+    }
+
+    async function getMine() {
+        const userId = document.getElementById("userId").value;
+        const unreadOnly = document.getElementById("unreadOnly").value;
+
+        let url = "/api/notifications/me";
+        if (unreadOnly !== "") {
+            url += `?unreadOnly=${unreadOnly}`;
+        }
+
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    "X-USER-ID": userId
+                }
+            });
+
+            const data = await res.json();
+            renderList(data);
+            print(data);
+        } catch (error) {
+            printError(error);
+        }
+    }
+
+    async function getSelected() {
+        if (!selectedId) {
+            result.textContent = "먼저 목록에서 알림을 선택하세요.";
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/notifications/${selectedId}`);
+            print(await res.json());
+        } catch (error) {
+            printError(error);
+        }
+    }
+
+    async function markSelectedRead() {
+        if (!selectedId) {
+            result.textContent = "먼저 목록에서 알림을 선택하세요.";
+            return;
+        }
+
+        const userId = document.getElementById("userId").value;
+
+        try {
+            const res = await fetch(`/api/notifications/${selectedId}/read`, {
+                method: "PATCH",
+                headers: {
+                    "X-USER-ID": userId
+                }
+            });
+
+            const data = await res.json();
+            print(data);
+            await getMine();
+        } catch (error) {
+            printError(error);
+        }
+    }
+</script>
+</body>
+</html>
