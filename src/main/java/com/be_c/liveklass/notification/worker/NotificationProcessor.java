@@ -55,15 +55,10 @@ public class NotificationProcessor {
             dispatcher.send(noti);
             noti.markSent(LocalDateTime.now());
         } catch (Exception e) {
-            String reason = e.getMessage();
+            LocalDateTime failedAt = LocalDateTime.now();
+            LocalDateTime nextRetryAt = retryPolicy.nextRetryAt(noti.getRetryCount(), failedAt);
 
-            if (noti.canRetry()) {
-                LocalDateTime nextRetryAt = retryPolicy.nextRetryAt(noti.getRetryCount(), LocalDateTime.now());
-                noti.markFailed(reason, nextRetryAt, LocalDateTime.now());
-                return;
-            }
-
-            noti.markDead(reason, LocalDateTime.now());
+            noti.markSendFailed(e.getMessage(), nextRetryAt, failedAt);
         }
     }
 }

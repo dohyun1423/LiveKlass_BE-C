@@ -3,254 +3,669 @@
 <head>
     <meta charset="UTF-8" />
     <title>Notification Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f4f3ef;
+            --surface: #ffffff;
+            --surface-alt: #f9f8f5;
+            --border: #e2e0d8;
+            --border-strong: #c8c5ba;
+            --text: #1a1917;
+            --text-muted: #7a7770;
+            --accent: #2563eb;
+            --accent-light: #eff4ff;
+            --accent-border: #bfcfff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fff5f5;
+            --mono: 'IBM Plex Mono', monospace;
+            --sans: 'Noto Sans KR', sans-serif;
+            --radius: 8px;
+            --radius-sm: 5px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 1100px;
-            margin: 32px auto;
-            line-height: 1.5;
-            color: #222;
-        }
-
-        h1 {
-            margin-bottom: 24px;
-        }
-
-        section {
-            border: 1px solid #ddd;
-            padding: 16px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        input, select, textarea, button {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 8px;
-            margin-top: 4px;
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 32px 24px 64px;
             font-size: 14px;
+            line-height: 1.6;
         }
 
-        button {
-            cursor: pointer;
-            border: 1px solid #bbb;
-            background: #fafafa;
-            border-radius: 6px;
+        /* ── Page Header ── */
+        .page-header {
+            max-width: 1120px;
+            margin: 0 auto 28px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            border-bottom: 2px solid var(--text);
+            padding-bottom: 14px;
         }
 
-        button:hover {
-            background: #f0f0f0;
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-            font-size: 14px;
+        .page-header .sub {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
-        th, td {
-            border-bottom: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        tr {
-            cursor: pointer;
-        }
-
-        tr:hover {
-            background: #f7f7f7;
-        }
-
-        tr.selected {
-            background: #e9f2ff;
-        }
-
-        pre {
-            background: #f5f5f5;
-            padding: 12px;
-            border-radius: 8px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            min-height: 80px;
-        }
-
-        .grid {
+        /* ── Layout ── */
+        .layout {
+            max-width: 1120px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
 
-        .row {
+        .layout-full {
+            max-width: 1120px;
+            margin: 16px auto 0;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 14px 18px 13px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-alt);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .card-body {
+            padding: 18px;
+        }
+
+        /* ── Form Controls ── */
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+            margin-bottom: 14px;
         }
 
-        .actions {
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 11px;
+            font-size: 14px;
+            font-family: var(--sans);
+            color: var(--text);
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            -webkit-appearance: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        input[type="number"] {
+            font-family: var(--mono);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 72px;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7770' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: var(--sans);
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.12s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--text);
+            color: #fff;
+            border-color: var(--text);
+        }
+        .btn-primary:hover { background: #333; }
+
+        .btn-default {
+            background: var(--surface);
+            color: var(--text);
+            border-color: var(--border-strong);
+        }
+        .btn-default:hover { background: var(--surface-alt); border-color: #aaa; }
+
+        .btn-accent {
+            background: var(--accent-light);
+            color: var(--accent);
+            border-color: var(--accent-border);
+        }
+        .btn-accent:hover { background: #dde9ff; }
+
+        .btn-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: #fecaca;
+        }
+        .btn-danger:hover { background: #fee2e2; }
+
+        .btn-full { width: 100%; margin-top: 4px; }
+
+        .btn-group {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
-        .muted {
-            color: #666;
+        /* ── Hint ── */
+        .hint {
+            margin-top: 10px;
+            padding: 9px 12px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── Selection Badge ── */
+        .selection-bar {
+            margin-top: 14px;
+            padding: 10px 12px;
+            background: var(--accent-light);
+            border: 1px solid var(--accent-border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 13px;
         }
 
-        .pill {
+        .selection-bar .label-text {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-family: var(--mono);
+            font-weight: 500;
+        }
+
+        .badge-accent {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .badge-none {
+            background: var(--border);
+            color: var(--text-muted);
+        }
+
+        /* ── Table ── */
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead tr {
+            background: var(--surface-alt);
+            border-bottom: 2px solid var(--border);
+        }
+
+        th {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        tbody tr:last-child { border-bottom: none; }
+
+        tbody tr:hover { background: var(--surface-alt); }
+
+        tbody tr.selected { background: var(--accent-light); }
+        tbody tr.selected td { color: var(--accent); }
+
+        td {
+            padding: 10px 14px;
+            vertical-align: middle;
+        }
+
+        td.mono-cell {
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 28px 14px;
+            font-size: 13px;
+            cursor: default;
+        }
+
+        /* ── Status Pills ── */
+        .status-pill {
             display: inline-block;
             padding: 2px 8px;
-            border-radius: 999px;
-            background: #eee;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: var(--mono);
+            font-weight: 500;
+        }
+
+        .status-PENDING  { background: var(--warning-light); color: var(--warning); }
+        .status-SENT     { background: var(--success-light); color: var(--success); }
+        .status-FAILED   { background: var(--danger-light);  color: var(--danger);  }
+        .status-default  { background: var(--surface-alt);   color: var(--text-muted); }
+
+        .read-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .read-yes { background: var(--surface-alt); color: var(--text-muted); }
+        .read-no  { background: #fef3c7; color: #92400e; }
+
+        /* ── Response Panel ── */
+        .response-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .response-status {
+            font-family: var(--mono);
             font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.65;
+            min-height: 100px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        pre .json-key    { color: #9cdcfe; }
+        pre .json-string { color: #ce9178; }
+        pre .json-number { color: #b5cea8; }
+        pre .json-bool   { color: #569cd6; }
+        pre .json-null   { color: #569cd6; }
+
+        /* ── Divider ── */
+        .section-divider {
+            max-width: 1120px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-divider span {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: var(--text);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-<h1>Notification Test</h1>
 
-<div class="grid">
-    <section>
-        <h2>알림 등록</h2>
+<header class="page-header">
+    <h1>Notification Test</h1>
+    <span class="sub">알림 시스템 디버깅 도구</span>
+</header>
 
-        <div class="row">
-            <div>
-                <label>수신자 ID</label>
-                <input id="recipientId" type="number" value="1" />
+<div class="layout">
+
+    <!-- ── 알림 등록 ── -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">알림 등록</span>
+        </div>
+        <div class="card-body">
+
+            <div class="field-row">
+                <div>
+                    <label>수신자 ID</label>
+                    <input id="recipientId" type="number" value="1" />
+                </div>
+                <div>
+                    <label>강의 ID</label>
+                    <input id="lectureId" type="number" value="10" />
+                </div>
             </div>
 
-            <div>
-                <label>강의 ID</label>
-                <input id="lectureId" type="number" value="10" />
+            <div class="field-row">
+                <div>
+                    <label>알림 타입</label>
+                    <select id="notificationType">
+                        <option value="COURSE_ENROLLMENT_COMPLETED">COURSE_ENROLLMENT_COMPLETED</option>
+                        <option value="PAYMENT_CONFIRMED">PAYMENT_CONFIRMED</option>
+                        <option value="COURSE_START_D_MINUS_1">COURSE_START_D_MINUS_1</option>
+                        <option value="ENROLLMENT_CANCELED">ENROLLMENT_CANCELED</option>
+                    </select>
+                </div>
+                <div>
+                    <label>채널</label>
+                    <select id="channel">
+                        <option value="IN_APP">IN_APP</option>
+                        <option value="EMAIL">EMAIL</option>
+                    </select>
+                </div>
             </div>
+
+            <div class="field">
+                <label>이벤트 ID</label>
+                <input id="eventId" value="enrollment-1001" />
+            </div>
+
+            <div class="field">
+                <label>제목</label>
+                <input id="title" value="수강 신청 완료" />
+            </div>
+
+            <div class="field">
+                <label>내용</label>
+                <textarea id="message">수강 신청이 완료되었습니다.</textarea>
+            </div>
+
+            <div class="field">
+                <label>참조 데이터</label>
+                <textarea id="referenceData">{"enrollmentId":1001}</textarea>
+            </div>
+
+            <button class="btn btn-primary btn-full" onclick="createNotification()">알림 등록</button>
+
+            <div class="hint">
+                등록 직후 상태는 <code style="font-family:var(--mono);font-size:11px;background:#eee;padding:1px 5px;border-radius:3px;">PENDING</code>이며, Worker 처리 후 <code style="font-family:var(--mono);font-size:11px;background:#eee;padding:1px 5px;border-radius:3px;">SENT</code>로 변경됩니다.
+            </div>
+
         </div>
+    </div>
 
-        <label>알림 타입</label>
-        <select id="notificationType">
-            <option value="COURSE_ENROLLMENT_COMPLETED">COURSE_ENROLLMENT_COMPLETED</option>
-            <option value="PAYMENT_CONFIRMED">PAYMENT_CONFIRMED</option>
-            <option value="COURSE_START_D_MINUS_1">COURSE_START_D_MINUS_1</option>
-            <option value="ENROLLMENT_CANCELED">ENROLLMENT_CANCELED</option>
-        </select>
-
-        <label>채널</label>
-        <select id="channel">
-            <option value="IN_APP">IN_APP</option>
-            <option value="EMAIL">EMAIL</option>
-        </select>
-
-        <label>이벤트 ID</label>
-        <input id="eventId" value="enrollment-1001" />
-
-        <label>제목</label>
-        <input id="title" value="수강 신청 완료" />
-
-        <label>내용</label>
-        <textarea id="message" rows="3">수강 신청이 완료되었습니다.</textarea>
-
-        <label>참조 데이터</label>
-        <textarea id="referenceData" rows="3">{"enrollmentId":1001}</textarea>
-
-        <button onclick="createNotification()">알림 등록</button>
-
-        <p class="muted">
-            등록 후 상태는 PENDING이고, Worker 처리 후 SENT로 바뀝니다.
-        </p>
-    </section>
-
-    <section>
-        <h2>사용자 알림 조회</h2>
-
-        <label>X-USER-ID</label>
-        <input id="userId" type="number" value="1" />
-
-        <label>읽음 필터</label>
-        <select id="unreadOnly">
-            <option value="">전체</option>
-            <option value="true">안 읽음</option>
-            <option value="false">읽음</option>
-        </select>
-
-        <div class="actions">
-            <button onclick="getMine()">목록 조회</button>
-            <button onclick="getSelected()">선택 조회</button>
-            <button onclick="markSelectedRead()">읽음 처리</button>
-            <button onclick="clearSelection()">선택 해제</button>
+    <!-- ── 사용자 알림 조회 ── -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">알림 조회</span>
         </div>
+        <div class="card-body">
 
-        <p class="muted">
-            목록에서 알림을 클릭하면 선택됩니다. 읽음 처리는 선택된 알림에 대해 실행됩니다.
-        </p>
+            <div class="field-row">
+                <div>
+                    <label>X-USER-ID</label>
+                    <input id="userId" type="number" value="1" />
+                </div>
+                <div>
+                    <label>읽음 필터</label>
+                    <select id="unreadOnly">
+                        <option value="">전체</option>
+                        <option value="true">안 읽음</option>
+                        <option value="false">읽음</option>
+                    </select>
+                </div>
+            </div>
 
-        <div>
-            선택된 알림:
-            <span id="selectedLabel" class="pill">없음</span>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="getMine()">목록 조회</button>
+                <button class="btn btn-default" onclick="getSelected()">선택 조회</button>
+                <button class="btn btn-accent" onclick="markSelectedRead()">읽음 처리</button>
+                <button class="btn btn-danger" onclick="clearSelection()">선택 해제</button>
+            </div>
+
+            <div class="hint">
+                목록에서 행을 클릭하면 알림이 선택됩니다. 읽음 처리는 선택된 항목에만 적용됩니다.
+            </div>
+
+            <div class="selection-bar">
+                <span class="label-text">선택된 알림</span>
+                <span id="selectedLabel" class="badge badge-none">없음</span>
+            </div>
+
         </div>
-    </section>
+    </div>
+
 </div>
 
-<section>
-    <h2>알림 목록</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>수신자</th>
-            <th>타입</th>
-            <th>채널</th>
-            <th>상태</th>
-            <th>제목</th>
-            <th>읽음</th>
-            <th>생성일</th>
-        </tr>
-        </thead>
-        <tbody id="listBody">
-        <tr>
-            <td colspan="8" class="muted">목록 조회 전입니다.</td>
-        </tr>
-        </tbody>
-    </table>
-</section>
+<!-- ── 알림 목록 ── -->
+<div class="layout-full">
+    <div class="section-divider" style="margin-top:24px;"><span>알림 목록</span></div>
+    <div class="card">
+        <div class="card-body" style="padding:0;">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>수신자</th>
+                        <th>알림 타입</th>
+                        <th>채널</th>
+                        <th>상태</th>
+                        <th>제목</th>
+                        <th>읽음</th>
+                        <th>생성일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="listBody">
+                    <tr class="empty-row"><td colspan="8">아직 조회하지 않았습니다.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-<section>
-    <h2>응답</h2>
-    <pre id="result">아직 요청 없음</pre>
-</section>
+<!-- ── 응답 패널 ── -->
+<div class="layout-full">
+    <div class="section-divider" style="margin-top:24px;">
+        <span>응답</span>
+    </div>
+    <div class="card">
+        <div class="card-header response-header">
+            <span class="card-title">Response</span>
+            <span id="responseStatus" class="response-status">—</span>
+        </div>
+        <div class="card-body">
+            <pre id="result"><span style="color:#6b6b6b;">// 아직 요청 없음</span></pre>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
     let selectedId = null;
     let lastList = [];
 
-    const result = document.getElementById("result");
+    const resultEl = document.getElementById("result");
     const listBody = document.getElementById("listBody");
     const selectedLabel = document.getElementById("selectedLabel");
+    const responseStatus = document.getElementById("responseStatus");
+    const toast = document.getElementById("toast");
 
-    function print(data) {
-        result.textContent = JSON.stringify(data, null, 2);
+    /* ── Toast ── */
+    function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    /* ── JSON syntax highlight ── */
+    function highlight(json) {
+        return json
+            .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) return `<span class="json-key">${escapeHtml(match)}</span>`;
+                    return `<span class="json-string">${escapeHtml(match)}</span>`;
+                }
+                if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
+                if (/null/.test(match))       return `<span class="json-null">${match}</span>`;
+                return `<span class="json-number">${match}</span>`;
+            });
+    }
+
+    function print(data, status) {
+        const json = JSON.stringify(data, null, 2);
+        resultEl.innerHTML = highlight(json);
+        responseStatus.textContent = status ? `HTTP ${status}` : "";
     }
 
     function printError(error) {
-        result.textContent = error.message;
+        resultEl.innerHTML = `<span style="color:#f87171;">${escapeHtml(error.message)}</span>`;
+        responseStatus.textContent = "Error";
     }
 
+    /* ── Selection ── */
     function updateSelectedLabel() {
-        selectedLabel.textContent = selectedId ? `ID ${selectedId}` : "없음";
+        if (selectedId) {
+            selectedLabel.className = "badge badge-accent";
+            selectedLabel.textContent = `ID ${selectedId}`;
+        } else {
+            selectedLabel.className = "badge badge-none";
+            selectedLabel.textContent = "없음";
+        }
     }
 
     function clearSelection() {
         selectedId = null;
         updateSelectedLabel();
         renderList(lastList);
+        showToast("선택이 해제되었습니다.");
     }
 
     function selectNotification(id) {
@@ -259,42 +674,49 @@
         renderList(lastList);
     }
 
+    /* ── Status helpers ── */
+    function statusPill(status) {
+        const cls = ['PENDING','SENT','FAILED'].includes(status) ? `status-${status}` : 'status-default';
+        return `<span class="status-pill ${cls}">${status}</span>`;
+    }
+
+    function readPill(readAt) {
+        return readAt
+            ? `<span class="read-pill read-yes">읽음</span>`
+            : `<span class="read-pill read-no">안읽음</span>`;
+    }
+
+    /* ── Render ── */
     function renderList(list) {
         lastList = list;
-
         if (!list.length) {
-            listBody.innerHTML = '<tr><td colspan="8" class="muted">조회된 알림이 없습니다.</td></tr>';
+            listBody.innerHTML = '<tr class="empty-row"><td colspan="8">조회된 알림이 없습니다.</td></tr>';
             return;
         }
-
         listBody.innerHTML = list.map(item => {
-            const selectedClass = item.id === selectedId ? "selected" : "";
-            const readText = item.readAt ? "읽음" : "안읽음";
-
+            const sel = item.id === selectedId ? "selected" : "";
+            const date = item.createdAt ? item.createdAt.replace("T", " ").substring(0, 19) : "—";
             return `
-          <tr class="${selectedClass}" onclick="selectNotification(${item.id})">
-            <td>${item.id}</td>
-            <td>${item.recipientId}</td>
-            <td>${item.notificationType}</td>
-            <td>${item.channel}</td>
-            <td>${item.status}</td>
-            <td>${escapeHtml(item.title ?? "")}</td>
-            <td>${readText}</td>
-            <td>${item.createdAt ?? ""}</td>
-          </tr>
-        `;
+        <tr class="${sel}" onclick="selectNotification(${item.id})">
+          <td class="mono-cell">${item.id}</td>
+          <td class="mono-cell">${item.recipientId}</td>
+          <td><span style="font-size:11px;font-family:var(--mono);">${item.notificationType}</span></td>
+          <td>${item.channel}</td>
+          <td>${statusPill(item.status)}</td>
+          <td>${escapeHtml(item.title ?? "")}</td>
+          <td>${readPill(item.readAt)}</td>
+          <td class="mono-cell" style="font-size:11px;color:var(--text-muted);">${date}</td>
+        </tr>`;
         }).join("");
     }
 
     function escapeHtml(value) {
-        return value
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
+        return String(value)
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
     }
 
+    /* ── API Calls ── */
     async function createNotification() {
         const body = {
             recipientId: Number(document.getElementById("recipientId").value),
@@ -306,85 +728,54 @@
             message: document.getElementById("message").value,
             referenceData: document.getElementById("referenceData").value
         };
-
         try {
             const res = await fetch("/api/notifications", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json; charset=utf-8"
-                },
+                headers: { "Content-Type": "application/json; charset=utf-8" },
                 body: JSON.stringify(body)
             });
-
             const data = await res.json();
             selectedId = data.id;
             updateSelectedLabel();
-            print(data);
-        } catch (error) {
-            printError(error);
-        }
+            print(data, res.status);
+            showToast("알림이 등록되었습니다.");
+        } catch (error) { printError(error); }
     }
 
     async function getMine() {
         const userId = document.getElementById("userId").value;
         const unreadOnly = document.getElementById("unreadOnly").value;
-
         let url = "/api/notifications/me";
-        if (unreadOnly !== "") {
-            url += `?unreadOnly=${unreadOnly}`;
-        }
-
+        if (unreadOnly !== "") url += `?unreadOnly=${unreadOnly}`;
         try {
-            const res = await fetch(url, {
-                headers: {
-                    "X-USER-ID": userId
-                }
-            });
-
+            const res = await fetch(url, { headers: { "X-USER-ID": userId } });
             const data = await res.json();
             renderList(data);
-            print(data);
-        } catch (error) {
-            printError(error);
-        }
+            print(data, res.status);
+        } catch (error) { printError(error); }
     }
 
     async function getSelected() {
-        if (!selectedId) {
-            result.textContent = "먼저 목록에서 알림을 선택하세요.";
-            return;
-        }
-
+        if (!selectedId) { showToast("목록에서 알림을 선택하세요."); return; }
         try {
             const res = await fetch(`/api/notifications/${selectedId}`);
-            print(await res.json());
-        } catch (error) {
-            printError(error);
-        }
+            print(await res.json(), res.status);
+        } catch (error) { printError(error); }
     }
 
     async function markSelectedRead() {
-        if (!selectedId) {
-            result.textContent = "먼저 목록에서 알림을 선택하세요.";
-            return;
-        }
-
+        if (!selectedId) { showToast("목록에서 알림을 선택하세요."); return; }
         const userId = document.getElementById("userId").value;
-
         try {
             const res = await fetch(`/api/notifications/${selectedId}/read`, {
                 method: "PATCH",
-                headers: {
-                    "X-USER-ID": userId
-                }
+                headers: { "X-USER-ID": userId }
             });
-
             const data = await res.json();
-            print(data);
+            print(data, res.status);
+            showToast("읽음 처리 완료");
             await getMine();
-        } catch (error) {
-            printError(error);
-        }
+        } catch (error) { printError(error); }
     }
 </script>
 </body>

@@ -151,20 +151,19 @@ public class NotificationRequest {
         this.updatedAt = now;
     }
 
-    public void markFailed(String reason, LocalDateTime nextRetryAt, LocalDateTime now) {
+    public void markSendFailed(String reason, LocalDateTime nextRetryAt, LocalDateTime now) {
         this.retryCount++;
-        this.status = NotificationStatus.FAILED;
         this.lastFailureReason = reason;
-        this.nextRetryAt = nextRetryAt;
         this.processingStartedAt = null;
-        this.updatedAt = now;
-    }
 
-    public void markDead(String reason, LocalDateTime now) {
-        this.retryCount++;
-        this.status = NotificationStatus.DEAD;
-        this.lastFailureReason = reason;
-        this.processingStartedAt = null;
+        if (retryCount >= maxRetryCount) {
+            this.status = NotificationStatus.DEAD;
+            this.nextRetryAt = null;
+        } else {
+            this.status = NotificationStatus.FAILED;
+            this.nextRetryAt = nextRetryAt;
+        }
+
         this.updatedAt = now;
     }
 
@@ -174,7 +173,4 @@ public class NotificationRequest {
         this.updatedAt = now;
     }
 
-    public boolean canRetry() {
-        return retryCount < maxRetryCount;
-    }
 }
