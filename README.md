@@ -482,3 +482,232 @@ enrollment-fail-1001
 enrollment-slow-1001
 enrollment-slow-fail-1001
 ```
+
+### API 직접 테스트
+
+서버 실행 후 PowerShell에서 아래 순서대로 실행합니다.
+
+```bash
+.\gradlew.bat bootRun
+```
+
+1. 정상 발송 테스트
+```bash
+$body = @{
+  recipientId = 1
+  notificationType = "COURSE_ENROLLMENT_COMPLETED"
+  eventId = "api-success-1001"
+  lectureId = 10
+  channel = "IN_APP"
+  title = "success test"
+  message = "success message"
+  referenceData = '{"enrollmentId":1001}'
+} | ConvertTo-Json -Depth 5
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+
+$res = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/api/notifications" `
+  -ContentType "application/json; charset=utf-8" `
+  -Body $bytes
+
+$res
+$id = $res.id
+```
+기대 결과: `status = PENDING`
+
+5초뒤
+```bash
+Invoke-RestMethod -Method Get -Uri "http://localhost:8080/api/notifications/$id"
+```
+
+기대 결과: `status = SENT sentAt 값 존재`
+
+2. 사용자 알림 목록 조회
+
+```bash
+   Invoke-RestMethod `
+   -Method Get `
+   -Uri "http://localhost:8080/api/notifications/me" `
+   -Headers @{ "X-USER-ID" = "1" }
+```   
+기대 결과: `recipientId = 1 인 알림 목록 조회`
+
+3. 읽음 처리 테스트
+```bash
+    Invoke-RestMethod `
+   -Method Patch `
+   -Uri "http://localhost:8080/api/notifications/$id/read" `
+   -Headers @{ "X-USER-ID" = "1" }
+```   
+기대 결과: `readAt 값 존재`
+
+안 읽은 알림 목록에서 빠지는지 확인:
+
+```bash
+Invoke-RestMethod `
+-Method Get `
+-Uri "http://localhost:8080/api/notifications/me?unreadOnly=true" `
+-Headers @{ "X-USER-ID" = "1" }
+```
+
+읽은 알림 목록에 나오는지 확인:
+```bash
+Invoke-RestMethod `
+-Method Get `
+-Uri "http://localhost:8080/api/notifications/me?unreadOnly=false" `
+-Headers @{ "X-USER-ID" = "1" }
+```
+
+```md
+#### 4. 중복 생성 방지 테스트
+
+위의 정상 발송 테스트에서 사용한 것과 같은 요청을 다시 보냅니다.
+
+```powershell
+$res2 = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/api/notifications" `
+  -ContentType "application/json; charset=utf-8" `
+  -Body $bytes
+
+$res2
+```
+
+기대 결과:
+
+```text
+새 id가 생성되지 않고 기존 id가 반환됨
+```
+
+#### 5. 실패 및 재시도 테스트
+
+```powershell
+$body = @{
+  recipientId = 1
+  notificationType = "COURSE_ENROLLMENT_COMPLETED"
+  eventId = "api-fail-1001"
+  lectureId = 10
+  channel = "IN_APP"
+  title = "fail test"
+  message = "fail message"
+  referenceData = '{"enrollmentId":1001}'
+} | ConvertTo-Json -Depth 5
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+
+$res = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/api/notifications" `
+  -ContentType "application/json; charset=utf-8" `
+  -Body $bytes
+
+$res
+$failId = $res.id
+```
+
+기대 결과:
+
+```text
+status = PENDING
+```
+
+잠시 후 상태 확인:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:8080/api/notifications/$failId"
+```
+
+기대 흐름:
+
+```text
+1차 처리 후: FAILED, retryCount = 1
+2차 처리 후: FAILED, retryCount = 2
+3차 처리 후: DEAD, retryCount = 3
+lastFailureReason = Mock send failure
+```
+
+#### 6. PROCESSING 상태 확인
+
+```powershell
+$body = @{
+  recipientId = 1
+  notificationType = "COURSE_ENROLLMENT_COMPLETED"
+  eventId = "api-slow-1001"
+  lectureId = 10
+  channel = "IN_APP"
+  title = "slow test"
+  message = "slow message"
+  referenceData = '{"enrollmentId":1001}'
+} | ConvertTo-Json -Depth 5
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+
+$res = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/api/notifications" `
+  -ContentType "application/json; charset=utf-8" `
+  -Body $bytes
+
+$slowId = $res.id
+$res
+```
+
+Worker가 잡은 직후 10초 동안 조회:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:8080/api/notifications/$slowId"
+```
+
+기대 결과:
+
+```text
+처리 중: PROCESSING
+10초 후: SENT
+```
+
+#### 7. 예약 발송 테스트
+
+아래 명령은 현재 시각 기준 1분 뒤로 예약 시간을 만듭니다.
+
+```powershell
+$scheduledAt = (Get-Date).AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ss")
+
+$body = @{
+  recipientId = 1
+  notificationType = "COURSE_START_D_MINUS_1"
+  eventId = "api-scheduled-1001"
+  lectureId = 10
+  channel = "EMAIL"
+  title = "scheduled test"
+  message = "scheduled message"
+  referenceData = '{"lectureId":10}'
+  scheduledAt = $scheduledAt
+} | ConvertTo-Json -Depth 5
+
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+
+$res = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/api/notifications" `
+  -ContentType "application/json; charset=utf-8" `
+  -Body $bytes
+
+$scheduledId = $res.id
+$res
+```
+
+기대 결과:
+
+```text
+등록 직후: PENDING
+scheduledAt 이전: PENDING 유지
+scheduledAt 이후: SENT
+```
+
+상태 확인:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:8080/api/notifications/$scheduledId"
+```
