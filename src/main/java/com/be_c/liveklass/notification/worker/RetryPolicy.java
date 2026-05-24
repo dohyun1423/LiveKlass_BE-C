@@ -10,9 +10,9 @@ public class RetryPolicy {
 
     public LocalDateTime nextRetryAt(int retryCount, LocalDateTime now) {
         return switch (retryCount) {
-            case 0 -> now.plusSeconds(5);
-            case 1 -> now.plusSeconds(10);
-            default -> now.plusSeconds(15);
+            case 0 -> now.plusSeconds(10);
+            case 1 -> now.plusSeconds(20);
+            default -> now.plusSeconds(30);
         };
     }
 }

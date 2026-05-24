@@ -13,6 +13,10 @@ public class NotificationDispatcher {
     private final List<NotificationSender> senders;
 
     public void send(NotificationRequest noti) {
+        if (noti.getEventId().contains("slow")) {
+            sleep(10000);
+        }
+
         if (noti.getEventId().contains("fail")) {
             throw new RuntimeException("Mock send failure");
         }
@@ -23,5 +27,14 @@ public class NotificationDispatcher {
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported channel: " + noti.getChannel()));
 
         sender.send(noti);
+    }
+
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Mock send interrupted", e);
+        }
     }
 }

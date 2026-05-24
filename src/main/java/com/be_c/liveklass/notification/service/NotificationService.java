@@ -4,6 +4,7 @@ import com.be_c.liveklass.notification.domain.NotificationRequest;
 import com.be_c.liveklass.notification.dto.NotificationCreateRequest;
 import com.be_c.liveklass.notification.dto.NotificationResponse;
 import com.be_c.liveklass.notification.repository.NotificationRequestRepository;
+import com.be_c.liveklass.notification.domain.NotificationStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -80,10 +81,17 @@ public class NotificationService {
     public NotificationResponse markRead(Long id, Long userId) {
         NotificationRequest noti = getNoti(id);
         checkOwner(noti, userId);
+        checkReadable(noti);
 
         noti.markRead();
 
         return NotificationResponse.from(noti);
+    }
+
+    private void checkReadable(NotificationRequest noti) {
+        if (noti.getStatus() != NotificationStatus.SENT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only sent notifications can be marked as read.");
+        }
     }
 
     private NotificationRequest getNoti(Long id) {

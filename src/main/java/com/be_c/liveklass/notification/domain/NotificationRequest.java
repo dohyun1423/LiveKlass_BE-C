@@ -78,6 +78,7 @@ public class NotificationRequest {
     @Column(name = "last_failure_reason", columnDefinition = "TEXT")
     private String lastFailureReason;
 
+    // 선택구현 1 예약시간
     @Column(name = "scheduled_at")
     private LocalDateTime scheduledAt;
 

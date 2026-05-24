@@ -30,115 +30,126 @@
             --radius-sm: 5px;
             --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --header-h: 48px;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
             font-family: var(--sans);
             background: var(--bg);
             color: var(--text);
-            min-height: 100vh;
-            padding: 32px 24px 64px;
             font-size: 14px;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
         }
 
         /* ── Page Header ── */
         .page-header {
-            max-width: 1120px;
-            margin: 0 auto 28px;
+            height: var(--header-h);
+            min-height: var(--header-h);
+            padding: 0 20px;
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 12px;
             border-bottom: 2px solid var(--text);
-            padding-bottom: 14px;
+            background: var(--bg);
+            flex-shrink: 0;
         }
 
         .page-header h1 {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 600;
             letter-spacing: -0.02em;
         }
 
         .page-header .sub {
             font-family: var(--mono);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
-        /* ── Layout ── */
-        .layout {
-            max-width: 1120px;
-            margin: 0 auto;
+        /* ── 3-Column Layout ── */
+        .workspace {
+            flex: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            grid-template-columns: 27fr 43fr 30fr;
+            gap: 12px;
+            padding: 12px;
+            overflow: hidden;
+            min-height: 0;
         }
 
-        .layout-full {
-            max-width: 1120px;
-            margin: 16px auto 0;
-        }
-
-        /* ── Card ── */
-        .card {
+        /* ── Panel (each column) ── */
+        .panel {
+            display: flex;
+            flex-direction: column;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             overflow: hidden;
+            min-height: 0;
         }
 
-        .card-header {
-            padding: 14px 18px 13px;
+        .panel-header {
+            padding: 10px 14px;
             border-bottom: 1px solid var(--border);
+            background: var(--surface-alt);
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--surface-alt);
         }
 
-        .card-title {
-            font-size: 13px;
+        .panel-title {
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--text-muted);
         }
 
-        .card-body {
-            padding: 18px;
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            min-height: 0;
         }
+
+        .panel-body::-webkit-scrollbar { width: 4px; }
+        .panel-body::-webkit-scrollbar-track { background: transparent; }
+        .panel-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
 
         /* ── Form Controls ── */
-        .field {
-            margin-bottom: 14px;
-        }
-
-        .field:last-child {
-            margin-bottom: 0;
-        }
+        .field { margin-bottom: 12px; }
+        .field:last-child { margin-bottom: 0; }
 
         .field-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 14px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
         label {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 8px 11px;
-            font-size: 14px;
+            padding: 7px 10px;
+            font-size: 13px;
             font-family: var(--sans);
             color: var(--text);
             background: var(--surface);
@@ -154,20 +165,18 @@
             box-shadow: 0 0 0 3px var(--accent-light);
         }
 
-        input[type="number"] {
-            font-family: var(--mono);
-        }
+        input[type="number"] { font-family: var(--mono); }
 
         textarea {
             resize: vertical;
-            min-height: 72px;
+            min-height: 60px;
         }
 
         select {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7770' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 10px center;
-            padding-right: 30px;
+            padding-right: 28px;
             cursor: pointer;
         }
 
@@ -176,9 +185,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 8px 14px;
-            font-size: 13px;
+            padding: 7px 12px;
+            font-size: 12px;
             font-weight: 500;
             font-family: var(--sans);
             border-radius: var(--radius-sm);
@@ -188,113 +196,115 @@
             white-space: nowrap;
         }
 
-        .btn-primary {
-            background: var(--text);
-            color: #fff;
-            border-color: var(--text);
-        }
+        .btn-primary   { background: var(--text); color: #fff; border-color: var(--text); }
         .btn-primary:hover { background: #333; }
 
-        .btn-default {
-            background: var(--surface);
-            color: var(--text);
-            border-color: var(--border-strong);
-        }
+        .btn-default   { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
         .btn-default:hover { background: var(--surface-alt); border-color: #aaa; }
 
-        .btn-accent {
-            background: var(--accent-light);
-            color: var(--accent);
-            border-color: var(--accent-border);
-        }
+        .btn-accent    { background: var(--accent-light); color: var(--accent); border-color: var(--accent-border); }
         .btn-accent:hover { background: #dde9ff; }
 
-        .btn-danger {
-            background: var(--danger-light);
-            color: var(--danger);
-            border-color: #fecaca;
-        }
+        .btn-danger    { background: var(--danger-light); color: var(--danger); border-color: #fecaca; }
         .btn-danger:hover { background: #fee2e2; }
 
-        .btn-full { width: 100%; margin-top: 4px; }
+        .btn-full { width: 100%; }
 
         .btn-group {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 16px;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
         }
 
         /* ── Hint ── */
         .hint {
-            margin-top: 10px;
-            padding: 9px 12px;
+            padding: 8px 10px;
             background: var(--surface-alt);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             line-height: 1.5;
+            margin-top: 8px;
+        }
+
+        .hint code {
+            font-family: var(--mono);
+            font-size: 10px;
+            background: #e8e6e0;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        /* ── Section Separator ── */
+        .sep {
+            height: 1px;
+            background: var(--border);
+            margin: 14px 0;
         }
 
         /* ── Selection Badge ── */
         .selection-bar {
-            margin-top: 14px;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: var(--accent-light);
             border: 1px solid var(--accent-border);
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 13px;
+            font-size: 12px;
+            margin-top: 10px;
         }
 
         .selection-bar .label-text {
             font-weight: 500;
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .badge {
             display: inline-block;
-            padding: 2px 9px;
+            padding: 2px 8px;
             border-radius: 999px;
-            font-size: 12px;
+            font-size: 11px;
             font-family: var(--mono);
             font-weight: 500;
         }
 
-        .badge-accent {
-            background: var(--accent);
-            color: #fff;
-        }
+        .badge-accent { background: var(--accent); color: #fff; }
+        .badge-none   { background: var(--border); color: var(--text-muted); }
 
-        .badge-none {
-            background: var(--border);
-            color: var(--text-muted);
-        }
-
-        /* ── Table ── */
+        /* ── Table (중간 패널) ── */
         .table-wrap {
             overflow-x: auto;
+            flex: 1;
+            min-height: 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
+            table-layout: auto;
+        }
+
+        td, th {
+            white-space: nowrap;
         }
 
         thead tr {
             background: var(--surface-alt);
             border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
         th {
-            padding: 10px 14px;
+            padding: 8px 12px;
             text-align: left;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -309,50 +319,50 @@
         }
 
         tbody tr:last-child { border-bottom: none; }
-
         tbody tr:hover { background: var(--surface-alt); }
-
         tbody tr.selected { background: var(--accent-light); }
         tbody tr.selected td { color: var(--accent); }
 
         td {
-            padding: 10px 14px;
+            padding: 8px 12px;
             vertical-align: middle;
         }
 
         td.mono-cell {
             font-family: var(--mono);
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .empty-row td {
             text-align: center;
             color: var(--text-muted);
-            padding: 28px 14px;
-            font-size: 13px;
+            padding: 32px 12px;
+            font-size: 12px;
             cursor: default;
         }
 
         /* ── Status Pills ── */
         .status-pill {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 2px 7px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-family: var(--mono);
             font-weight: 500;
         }
 
-        .status-PENDING  { background: var(--warning-light); color: var(--warning); }
-        .status-SENT     { background: var(--success-light); color: var(--success); }
-        .status-FAILED   { background: var(--danger-light);  color: var(--danger);  }
-        .status-default  { background: var(--surface-alt);   color: var(--text-muted); }
+        .status-PENDING    { background: var(--warning-light); color: var(--warning); }
+        .status-PROCESSING { background: var(--accent-light);  color: var(--accent);  }
+        .status-SENT       { background: var(--success-light); color: var(--success); }
+        .status-FAILED     { background: var(--danger-light);  color: var(--danger);  }
+        .status-DEAD       { background: #1f2937;              color: #ffffff;        }
+        .status-default    { background: var(--surface-alt);   color: var(--text-muted); }
 
         .read-pill {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 2px 7px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
         }
 
@@ -360,32 +370,38 @@
         .read-no  { background: #fef3c7; color: #92400e; }
 
         /* ── Response Panel ── */
-        .response-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
         .response-status {
             font-family: var(--mono);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
+        .pre-wrap {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
         pre {
+            flex: 1;
             background: #1e1e1e;
             color: #d4d4d4;
-            padding: 16px;
+            padding: 14px;
             border-radius: var(--radius-sm);
-            overflow-x: auto;
-            white-space: pre-wrap;
-            font-family: var(--mono);
-            font-size: 12.5px;
-            line-height: 1.65;
-            min-height: 100px;
-            max-height: 320px;
             overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: var(--mono);
+            font-size: 11.5px;
+            line-height: 1.65;
+            min-height: 0;
         }
+
+        pre::-webkit-scrollbar { width: 4px; }
+        pre::-webkit-scrollbar-track { background: #2a2a2a; }
+        pre::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
 
         pre .json-key    { color: #9cdcfe; }
         pre .json-string { color: #ce9178; }
@@ -393,54 +409,42 @@
         pre .json-bool   { color: #569cd6; }
         pre .json-null   { color: #569cd6; }
 
-        /* ── Divider ── */
-        .section-divider {
-            max-width: 1120px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-divider span {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-
-        .section-divider::before,
-        .section-divider::after {
-            content: '';
+        /* response panel body needs flex layout */
+        .response-body {
             flex: 1;
-            height: 1px;
-            background: var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            min-height: 0;
+            overflow: hidden;
         }
 
         /* ── Toast ── */
         #toast {
             position: fixed;
-            bottom: 28px;
-            right: 28px;
+            bottom: 20px;
+            right: 20px;
             background: var(--text);
             color: #fff;
-            padding: 10px 18px;
+            padding: 9px 16px;
             border-radius: var(--radius);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             box-shadow: var(--shadow-md);
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(6px);
             transition: opacity 0.2s, transform 0.2s;
             pointer-events: none;
             z-index: 999;
         }
 
-        #toast.show {
-            opacity: 1;
-            transform: translateY(0);
+        #toast.show { opacity: 1; transform: translateY(0); }
+
+        /* 중간 패널은 테이블 스크롤 전용 */
+        .panel.mid .panel-body {
+            padding: 0;
+            overflow-y: auto;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -448,17 +452,16 @@
 
 <header class="page-header">
     <h1>Notification Test</h1>
-    <span class="sub">알림 시스템 디버깅 도구</span>
 </header>
 
-<div class="layout">
+<div class="workspace">
 
-    <!-- ── 알림 등록 ── -->
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">알림 등록</span>
+    <!-- ── 왼쪽: 알림 등록 + 조회 컨트롤 ── -->
+    <div class="panel">
+        <div class="panel-header">
+            <span class="panel-title">알림 등록</span>
         </div>
-        <div class="card-body">
+        <div class="panel-body">
 
             <div class="field-row">
                 <div>
@@ -493,6 +496,11 @@
             <div class="field">
                 <label>이벤트 ID</label>
                 <input id="eventId" value="enrollment-1001" />
+                <div class="hint">
+                    <code>slow</code> 포함 시 PROCESSING 확인,
+                    <code>fail</code> 포함 시 FAILED/DEAD 확인<br>
+                    예: <code>enrollment-slow-1001</code>, <code>enrollment-fail-1001</code>
+                </div>
             </div>
 
             <div class="field">
@@ -507,103 +515,95 @@
 
             <div class="field">
                 <label>참조 데이터</label>
-                <textarea id="referenceData">{"enrollmentId":1001}</textarea>
+                <textarea id="referenceData" style="min-height:48px;">{"enrollmentId":1001}</textarea>
             </div>
 
             <button class="btn btn-primary btn-full" onclick="createNotification()">알림 등록</button>
 
             <div class="hint">
-                등록 직후 상태는 <code style="font-family:var(--mono);font-size:11px;background:#eee;padding:1px 5px;border-radius:3px;">PENDING</code>이며, Worker 처리 후 <code style="font-family:var(--mono);font-size:11px;background:#eee;padding:1px 5px;border-radius:3px;">SENT</code>로 변경됩니다.
+                등록 직후 <code>PENDING</code> → Worker 처리 후 <code>SENT</code>
             </div>
 
         </div>
     </div>
 
-    <!-- ── 사용자 알림 조회 ── -->
-    <div class="card">
-        <div class="card-header">
-            <span class="card-title">알림 조회</span>
-        </div>
-        <div class="card-body">
+    <!-- ── 가운데: 조회 컨트롤 (상) + 알림 목록 (하) ── -->
+    <div style="display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden;">
 
-            <div class="field-row">
-                <div>
-                    <label>X-USER-ID</label>
-                    <input id="userId" type="number" value="1" />
-                </div>
-                <div>
-                    <label>읽음 필터</label>
-                    <select id="unreadOnly">
-                        <option value="">전체</option>
-                        <option value="true">안 읽음</option>
-                        <option value="false">읽음</option>
-                    </select>
+        <!-- 조회 컨트롤 -->
+        <div class="panel" style="flex-shrink:0;">
+            <div class="panel-header">
+                <span class="panel-title">알림 조회</span>
+                <div class="selection-bar" style="margin:0;padding:5px 10px;">
+                    <span class="label-text">선택</span>
+                    <span id="selectedLabel" class="badge badge-none">없음</span>
                 </div>
             </div>
-
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="getMine()">목록 조회</button>
-                <button class="btn btn-default" onclick="getSelected()">선택 조회</button>
-                <button class="btn btn-accent" onclick="markSelectedRead()">읽음 처리</button>
-                <button class="btn btn-danger" onclick="clearSelection()">선택 해제</button>
+            <div class="panel-body" style="padding:12px;">
+                <div class="field-row" style="margin-bottom:0;">
+                    <div>
+                        <label>X-USER-ID</label>
+                        <input id="userId" type="number" value="1" />
+                    </div>
+                    <div>
+                        <label>읽음 필터</label>
+                        <select id="unreadOnly">
+                            <option value="">전체</option>
+                            <option value="true">안 읽음</option>
+                            <option value="false">읽음</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group" style="grid-template-columns:repeat(4,1fr);margin-top:10px;margin-bottom:0;">
+                    <button class="btn btn-primary"  onclick="getMine()">목록 조회</button>
+                    <button class="btn btn-default"  onclick="getSelected()">선택 조회</button>
+                    <button class="btn btn-accent"   onclick="markSelectedRead()">읽음 처리</button>
+                    <button class="btn btn-danger"   onclick="clearSelection()">선택 해제</button>
+                </div>
             </div>
-
-            <div class="hint">
-                목록에서 행을 클릭하면 알림이 선택됩니다. 읽음 처리는 선택된 항목에만 적용됩니다.
-            </div>
-
-            <div class="selection-bar">
-                <span class="label-text">선택된 알림</span>
-                <span id="selectedLabel" class="badge badge-none">없음</span>
-            </div>
-
         </div>
-    </div>
 
-</div>
-
-<!-- ── 알림 목록 ── -->
-<div class="layout-full">
-    <div class="section-divider" style="margin-top:24px;"><span>알림 목록</span></div>
-    <div class="card">
-        <div class="card-body" style="padding:0;">
-            <div class="table-wrap">
+        <!-- 알림 목록 -->
+        <div class="panel mid" style="flex:1;min-height:0;">
+            <div class="panel-header">
+                <span class="panel-title">알림 목록</span>
+                <span id="listCount" style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">—</span>
+            </div>
+            <div class="panel-body">
                 <table>
                     <thead>
                     <tr>
                         <th>ID</th>
                         <th>수신자</th>
-                        <th>알림 타입</th>
+                        <th>타입</th>
                         <th>채널</th>
                         <th>상태</th>
                         <th>제목</th>
                         <th>읽음</th>
+                        <th>실패 사유</th>
                         <th>생성일</th>
                     </tr>
                     </thead>
                     <tbody id="listBody">
-                    <tr class="empty-row"><td colspan="8">아직 조회하지 않았습니다.</td></tr>
+                    <tr class="empty-row"><td colspan="9">아직 조회하지 않았습니다.</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- ── 응답 패널 ── -->
-<div class="layout-full">
-    <div class="section-divider" style="margin-top:24px;">
-        <span>응답</span>
     </div>
-    <div class="card">
-        <div class="card-header response-header">
-            <span class="card-title">Response</span>
+
+    <!-- ── 오른쪽: Response ── -->
+    <div class="panel" style="display:flex;flex-direction:column;">
+        <div class="panel-header">
+            <span class="panel-title">Response</span>
             <span id="responseStatus" class="response-status">—</span>
         </div>
-        <div class="card-body">
+        <div class="response-body">
             <pre id="result"><span style="color:#6b6b6b;">// 아직 요청 없음</span></pre>
         </div>
     </div>
+
 </div>
 
 <div id="toast"></div>
@@ -612,23 +612,23 @@
     let selectedId = null;
     let lastList = [];
 
-    const resultEl = document.getElementById("result");
-    const listBody = document.getElementById("listBody");
+    const resultEl      = document.getElementById("result");
+    const listBody      = document.getElementById("listBody");
+    const listCount     = document.getElementById("listCount");
     const selectedLabel = document.getElementById("selectedLabel");
-    const responseStatus = document.getElementById("responseStatus");
-    const toast = document.getElementById("toast");
+    const responseStatus= document.getElementById("responseStatus");
+    const toast         = document.getElementById("toast");
 
-    /* ── Toast ── */
     function showToast(msg) {
         toast.textContent = msg;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 2200);
     }
 
-    /* ── JSON syntax highlight ── */
     function highlight(json) {
-        return json
-            .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+        return json.replace(
+            /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+            match => {
                 if (/^"/.test(match)) {
                     if (/:$/.test(match)) return `<span class="json-key">${escapeHtml(match)}</span>`;
                     return `<span class="json-string">${escapeHtml(match)}</span>`;
@@ -636,12 +636,12 @@
                 if (/true|false/.test(match)) return `<span class="json-bool">${match}</span>`;
                 if (/null/.test(match))       return `<span class="json-null">${match}</span>`;
                 return `<span class="json-number">${match}</span>`;
-            });
+            }
+        );
     }
 
     function print(data, status) {
-        const json = JSON.stringify(data, null, 2);
-        resultEl.innerHTML = highlight(json);
+        resultEl.innerHTML = highlight(JSON.stringify(data, null, 2));
         responseStatus.textContent = status ? `HTTP ${status}` : "";
     }
 
@@ -650,7 +650,6 @@
         responseStatus.textContent = "Error";
     }
 
-    /* ── Selection ── */
     function updateSelectedLabel() {
         if (selectedId) {
             selectedLabel.className = "badge badge-accent";
@@ -674,9 +673,9 @@
         renderList(lastList);
     }
 
-    /* ── Status helpers ── */
     function statusPill(status) {
-        const cls = ['PENDING','SENT','FAILED'].includes(status) ? `status-${status}` : 'status-default';
+        const known = ['PENDING','PROCESSING','SENT','FAILED','DEAD'];
+        const cls = known.includes(status) ? `status-${status}` : 'status-default';
         return `<span class="status-pill ${cls}">${status}</span>`;
     }
 
@@ -686,26 +685,27 @@
             : `<span class="read-pill read-no">안읽음</span>`;
     }
 
-    /* ── Render ── */
     function renderList(list) {
         lastList = list;
+        listCount.textContent = list.length ? `${list.length}건` : "—";
         if (!list.length) {
-            listBody.innerHTML = '<tr class="empty-row"><td colspan="8">조회된 알림이 없습니다.</td></tr>';
+            listBody.innerHTML = '<tr class="empty-row"><td colspan="9">조회된 알림이 없습니다.</td></tr>';
             return;
         }
         listBody.innerHTML = list.map(item => {
-            const sel = item.id === selectedId ? "selected" : "";
-            const date = item.createdAt ? item.createdAt.replace("T", " ").substring(0, 19) : "—";
+            const sel  = item.id === selectedId ? "selected" : "";
+            const date = item.createdAt ? item.createdAt.replace("T"," ").substring(0,19) : "—";
             return `
         <tr class="${sel}" onclick="selectNotification(${item.id})">
           <td class="mono-cell">${item.id}</td>
           <td class="mono-cell">${item.recipientId}</td>
-          <td><span style="font-size:11px;font-family:var(--mono);">${item.notificationType}</span></td>
+          <td><span style="font-size:10px;font-family:var(--mono);">${item.notificationType}</span></td>
           <td>${item.channel}</td>
           <td>${statusPill(item.status)}</td>
           <td>${escapeHtml(item.title ?? "")}</td>
           <td>${readPill(item.readAt)}</td>
-          <td class="mono-cell" style="font-size:11px;color:var(--text-muted);">${date}</td>
+          <td style="font-size:11px;color:var(--danger);">${escapeHtml(item.lastFailureReason ?? "")}</td>
+          <td class="mono-cell" style="font-size:10px;color:var(--text-muted);">${date}</td>
         </tr>`;
         }).join("");
     }
@@ -716,20 +716,19 @@
             .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
     }
 
-    /* ── API Calls ── */
     async function createNotification() {
         const body = {
-            recipientId: Number(document.getElementById("recipientId").value),
+            recipientId:      Number(document.getElementById("recipientId").value),
             notificationType: document.getElementById("notificationType").value,
-            eventId: document.getElementById("eventId").value,
-            lectureId: Number(document.getElementById("lectureId").value),
-            channel: document.getElementById("channel").value,
-            title: document.getElementById("title").value,
-            message: document.getElementById("message").value,
-            referenceData: document.getElementById("referenceData").value
+            eventId:          document.getElementById("eventId").value,
+            lectureId:        Number(document.getElementById("lectureId").value),
+            channel:          document.getElementById("channel").value,
+            title:            document.getElementById("title").value,
+            message:          document.getElementById("message").value,
+            referenceData:    document.getElementById("referenceData").value
         };
         try {
-            const res = await fetch("/api/notifications", {
+            const res  = await fetch("/api/notifications", {
                 method: "POST",
                 headers: { "Content-Type": "application/json; charset=utf-8" },
                 body: JSON.stringify(body)
@@ -739,20 +738,20 @@
             updateSelectedLabel();
             print(data, res.status);
             showToast("알림이 등록되었습니다.");
-        } catch (error) { printError(error); }
+        } catch (e) { printError(e); }
     }
 
     async function getMine() {
-        const userId = document.getElementById("userId").value;
-        const unreadOnly = document.getElementById("unreadOnly").value;
+        const userId    = document.getElementById("userId").value;
+        const unreadOnly= document.getElementById("unreadOnly").value;
         let url = "/api/notifications/me";
         if (unreadOnly !== "") url += `?unreadOnly=${unreadOnly}`;
         try {
-            const res = await fetch(url, { headers: { "X-USER-ID": userId } });
+            const res  = await fetch(url, { headers: { "X-USER-ID": userId } });
             const data = await res.json();
             renderList(data);
             print(data, res.status);
-        } catch (error) { printError(error); }
+        } catch (e) { printError(e); }
     }
 
     async function getSelected() {
@@ -760,14 +759,14 @@
         try {
             const res = await fetch(`/api/notifications/${selectedId}`);
             print(await res.json(), res.status);
-        } catch (error) { printError(error); }
+        } catch (e) { printError(e); }
     }
 
     async function markSelectedRead() {
         if (!selectedId) { showToast("목록에서 알림을 선택하세요."); return; }
         const userId = document.getElementById("userId").value;
         try {
-            const res = await fetch(`/api/notifications/${selectedId}/read`, {
+            const res  = await fetch(`/api/notifications/${selectedId}/read`, {
                 method: "PATCH",
                 headers: { "X-USER-ID": userId }
             });
@@ -775,7 +774,7 @@
             print(data, res.status);
             showToast("읽음 처리 완료");
             await getMine();
-        } catch (error) { printError(error); }
+        } catch (e) { printError(e); }
     }
 </script>
 </body>
