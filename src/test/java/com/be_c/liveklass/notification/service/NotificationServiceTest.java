@@ -33,7 +33,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void 알림_생성시_PENDING_상태로_저장된다() {
+    void createShouldSaveNotificationAsPending() {
         NotificationResponse res = service.create(createReq("event-1", 1L));
 
         assertThat(res.id()).isNotNull();
@@ -42,7 +42,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void 동일_이벤트는_중복_생성되지_않는다() {
+    void duplicateEventShouldNotCreateNewNotification() {
         service.create(createReq("event-dup", 1L));
         service.create(createReq("event-dup", 1L));
 
@@ -52,7 +52,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void 사용자_알림_목록을_조회한다() {
+    void getByUserShouldReturnOnlyUserNotifications() {
         service.create(createReq("event-list-1", 1L));
         service.create(createReq("event-list-2", 1L));
         service.create(createReq("event-list-3", 2L));
@@ -65,7 +65,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void 다른_사용자의_알림은_읽음_처리할_수_없다() {
+    void markReadShouldRejectOtherUserNotification() { //다른_사용자의_알림은_읽음_처리할_수_없다
         NotificationResponse res = service.create(createReq("event-owner", 1L));
 
         assertThatThrownBy(() -> service.markRead(res.id(), 999L))

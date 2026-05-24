@@ -34,7 +34,7 @@ class NotificationProcessorTest {
     }
 
     @Test
-    void 발송_성공시_SENT_상태가_된다() {
+    void processReadyShouldMarkNotificationAsSentWhenSendSucceeds() {   // 발송_성공시_SENT_상태가_된다
         NotificationResponse created = service.create(createReq("event-success"));
 
         processor.processReady();
@@ -46,7 +46,7 @@ class NotificationProcessorTest {
     }
 
     @Test
-    void 발송_실패시_FAILED_상태와_실패사유가_저장된다() {
+    void processReadyShouldMarkNotificationAsFailedWhenSendFails() {   // 발송_실패시_FAILED_상태와_실패사유가_저장된다
         NotificationResponse created = service.create(createReq("event-fail-1"));
 
         processor.processReady();
@@ -60,7 +60,7 @@ class NotificationProcessorTest {
     }
 
     @Test
-    void 최대_실패_횟수에_도달하면_DEAD_상태가_된다() {
+    void processReadyShouldMarkNotificationAsDeadAfterMaxFailures() {   // 최대_실패_횟수에_도달하면_DEAD_상태가_된다
         NotificationResponse created = service.create(createReq("event-fail-dead"));
 
         processor.processReady();

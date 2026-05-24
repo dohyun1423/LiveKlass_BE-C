@@ -7,7 +7,6 @@ import com.be_c.liveklass.notification.repository.NotificationRequestRepository;
 import com.be_c.liveklass.notification.domain.NotificationStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +23,15 @@ public class NotificationService {
 
     @Transactional
     public NotificationResponse create(NotificationCreateRequest req) {
+        return repo.findByRecipientIdAndTypeAndEventIdAndChannel(
+                req.recipientId(),
+                req.notificationType(),
+                req.eventId(),
+                req.channel()
+        ).map(NotificationResponse::from).orElseGet(() -> createNew(req));
+    }
+
+    private NotificationResponse createNew(NotificationCreateRequest req) {
         LocalDateTime scheduleAt = req.scheduledAt() == null
                 ? LocalDateTime.now()
                 : req.scheduledAt();
@@ -40,18 +48,7 @@ public class NotificationService {
                 scheduleAt
         );
 
-        try {
-            return NotificationResponse.from(repo.save(noti));
-        } catch (DataIntegrityViolationException e) {
-            NotificationRequest duplicate = repo.findByRecipientIdAndTypeAndEventIdAndChannel(
-                    req.recipientId(),
-                    req.notificationType(),
-                    req.eventId(),
-                    req.channel()
-            ).orElseThrow(() -> e);
-
-            return NotificationResponse.from(duplicate);
-        }
+        return NotificationResponse.from(repo.save(noti));
     }
 
     @Transactional(readOnly = true)

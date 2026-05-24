@@ -177,7 +177,7 @@ claimReady()
 3회 실패 시 DEAD 처리
 ```
 
-운영 환경에서는 아래처럼 더 긴 간격으로 조정하는 것을 가정했습니다.
+운영 환경에서는 더 긴 간격으로 조정하는 것을 가정했습니다.
 
 ### 중복 발송 방지
 
@@ -365,8 +365,6 @@ Invoke-RestMethod `
   -Uri "http://localhost:8080/api/notifications/1/read" `
   -Headers @{ "X-USER-ID" = "1" }
 ```
-
-읽음 처리는 `IN_APP` 채널의 `SENT` 상태 알림에만 허용됩니다.
 
 ## 데이터 모델 설명
 
