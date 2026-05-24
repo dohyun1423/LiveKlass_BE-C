@@ -401,24 +401,45 @@ recipient_id + notification_type + event_id + channel
 
 동일한 이벤트에 대해 같은 사용자에게 같은 채널로 알림이 중복 생성되지 않도록 합니다.
 
+
 ## 테스트 실행 방법
 
 ### 자동 테스트
 
+아래 테스트를 실행하여 성공을 확인했습니다.
+
 ```bash
 .\gradlew.bat test
 ```
+실행 결과: 
+BUILD SUCCESSFUL
 
-현재 기본 context load 테스트가 포함되어 있습니다. 제출 전 아래 테스트를 추가로 보강하는 것이 좋습니다.
 
-- 알림 생성 시 `PENDING` 저장
-- 동일 이벤트 중복 생성 방지
-- 사용자 알림 목록 조회
-- 읽음 처리 및 권한 검증
-- 발송 성공 시 `SENT`
-- 발송 실패 시 `FAILED`
-- 최대 실패 횟수 도달 시 `DEAD`
-- 오래 지속된 `PROCESSING` 복구
+개별 테스트도 성공을 확인했습니다.
+```bash
+.\gradlew.bat test --tests "com.be_c.liveklass.notification.service.NotificationServiceTest"
+.\gradlew.bat test --tests "com.be_c.liveklass.notification.worker.NotificationProcessorTest"
+```
+
+NotificationServiceTest
+```bash
+- 알림 생성 시 PENDING 상태 저장 검증
+- 동일 이벤트 중복 생성 방지 검증
+- 사용자별 알림 목록 조회 검증
+- 다른 사용자의 알림 읽음 처리 차단 검증
+```
+
+NotificationProcessorTest
+```bash
+- 발송 성공 시 SENT 상태 변경 검증
+- 발송 실패 시 FAILED 상태 및 실패 사유 저장 검증
+- 최대 실패 횟수 도달 시 DEAD 상태 변경 검증
+```
+
+테스트 리포트는 아래 경로에서 확인할 수 있습니다.
+```bach
+build/reports/tests/test/index.html
+```
 
 ### 수동 테스트 페이지
 
