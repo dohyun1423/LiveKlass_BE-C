@@ -514,6 +514,14 @@
             </div>
 
             <div class="field">
+                <label>예약 발송 시각</label>
+                <input id="scheduledAt" type="datetime-local" />
+                <div class="hint" style="margin-top:6px;">
+                    비워두면 즉시 발송 대상으로 등록됩니다. 값을 입력하면 해당 시각 이후 Worker가 처리합니다.
+                </div>
+            </div>
+
+            <div class="field">
                 <label>참조 데이터</label>
                 <textarea id="referenceData" style="min-height:48px;">{"enrollmentId":1001}</textarea>
             </div>
@@ -580,12 +588,13 @@
                         <th>상태</th>
                         <th>제목</th>
                         <th>읽음</th>
+                        <th>예약 시각</th>
                         <th>실패 사유</th>
                         <th>생성일</th>
                     </tr>
                     </thead>
                     <tbody id="listBody">
-                    <tr class="empty-row"><td colspan="9">아직 조회하지 않았습니다.</td></tr>
+                    <tr class="empty-row"><td colspan="10">아직 조회하지 않았습니다.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -597,7 +606,7 @@
     <div class="panel" style="display:flex;flex-direction:column;">
         <div class="panel-header">
             <span class="panel-title">Response</span>
-            <span id="responseStatus" class="response-status">—</span>
+            <span id="responseStatus" class="response-status"> — </span>
         </div>
         <div class="response-body">
             <pre id="result"><span style="color:#6b6b6b;">// 아직 요청 없음</span></pre>
@@ -689,12 +698,13 @@
         lastList = list;
         listCount.textContent = list.length ? `${list.length}건` : "—";
         if (!list.length) {
-            listBody.innerHTML = '<tr class="empty-row"><td colspan="9">조회된 알림이 없습니다.</td></tr>';
+            listBody.innerHTML = '<tr class="empty-row"><td colspan="10">조회된 알림이 없습니다.</td></tr>';
             return;
         }
         listBody.innerHTML = list.map(item => {
             const sel  = item.id === selectedId ? "selected" : "";
-            const date = item.createdAt ? item.createdAt.replace("T"," ").substring(0,19) : "—";
+            const date = item.createdAt ? item.createdAt.replace("T", " ").substring(0, 19) : "-";
+            const scheduled = item.scheduledAt ? item.scheduledAt.replace("T", " ").substring(0, 19) : "-";
             return `
         <tr class="${sel}" onclick="selectNotification(${item.id})">
           <td class="mono-cell">${item.id}</td>
@@ -704,6 +714,7 @@
           <td>${statusPill(item.status)}</td>
           <td>${escapeHtml(item.title ?? "")}</td>
           <td>${readPill(item.readAt)}</td>
+          <td class="mono-cell" style="font-size:11px;color:var(--text-muted);">${scheduled}</td>
           <td style="font-size:11px;color:var(--danger);">${escapeHtml(item.lastFailureReason ?? "")}</td>
           <td class="mono-cell" style="font-size:10px;color:var(--text-muted);">${date}</td>
         </tr>`;
@@ -717,16 +728,22 @@
     }
 
     async function createNotification() {
+        const scheduledAt = document.getElementById("scheduledAt").value;
+
         const body = {
-            recipientId:      Number(document.getElementById("recipientId").value),
+            recipientId: Number(document.getElementById("recipientId").value),
             notificationType: document.getElementById("notificationType").value,
-            eventId:          document.getElementById("eventId").value,
-            lectureId:        Number(document.getElementById("lectureId").value),
-            channel:          document.getElementById("channel").value,
-            title:            document.getElementById("title").value,
-            message:          document.getElementById("message").value,
-            referenceData:    document.getElementById("referenceData").value
+            eventId: document.getElementById("eventId").value,
+            lectureId: Number(document.getElementById("lectureId").value),
+            channel: document.getElementById("channel").value,
+            title: document.getElementById("title").value,
+            message: document.getElementById("message").value,
+            referenceData: document.getElementById("referenceData").value
         };
+
+        if (scheduledAt) {
+            body.scheduledAt = scheduledAt;
+        }
         try {
             const res  = await fetch("/api/notifications", {
                 method: "POST",
